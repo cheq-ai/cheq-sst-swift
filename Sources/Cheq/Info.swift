@@ -62,6 +62,9 @@ enum Info {
     }
     
     static func getScreenInfo() -> ScreenInfo {
+#if os(visionOS)
+        return ScreenInfo(orientation: "Vision", height: 0, width: 0)
+#else
         let bounds = UIScreen.main.bounds
         let orientation: String
         switch UIDevice.current.orientation {
@@ -83,5 +86,6 @@ enum Info {
             orientation = "Unknown"
         }
         return ScreenInfo(orientation: orientation, height: Int(bounds.height), width: Int(bounds.width))
+#endif
     }
 }
