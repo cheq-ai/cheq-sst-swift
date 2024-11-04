@@ -4,7 +4,7 @@ import UIKit
 enum Info {
     
     static let library_name = "cheq-sst-swift"
-    static let library_version = "0.2.0"
+    static let library_version = "0.2.1"
     
     static var cpuArchitecture: String = {
 #if arch(x86_64)
