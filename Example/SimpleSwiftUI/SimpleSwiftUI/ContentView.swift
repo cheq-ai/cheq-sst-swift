@@ -126,7 +126,7 @@ struct ConfigView: View {
             Button("Reset Demo Config") {
                 SimpleSwiftUIApp.initializeSst()
             }.padding()
-            NavigationLink(destination: LoginView()) {
+            NavigationLink(destination: HomeView()) {
                 Text("Go to Home")
             }.padding()
         }
