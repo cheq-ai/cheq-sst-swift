@@ -10,19 +10,19 @@ class CheqAdvertisingModel: Model {
     }
     
     override func get(event: Event, sst: Sst) async -> Any {
-        var trackingAuthorized = false
+        var enabled = false
         var id = "Unknown"
 #if canImport(AdSupport)
         if ATTrackingManager.trackingAuthorizationStatus == .authorized {
-            trackingAuthorized = true
+            enabled = true
             id = ASIdentifierManager.shared().advertisingIdentifier.uuidString
         }
 #endif
-        return AdvertisingInfo(id: id, trackingAuthorized: trackingAuthorized)
+        return AdvertisingInfo(id: id, enabled: enabled)
     }
 }
 
 struct AdvertisingInfo: Encodable {
     let id: String
-    let trackingAuthorized: Bool
+    let enabled: Bool
 }

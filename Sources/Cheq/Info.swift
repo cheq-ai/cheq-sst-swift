@@ -4,7 +4,7 @@ import UIKit
 enum Info {
     
     static let library_name = "cheq-sst-swift"
-    static let library_version = "0.2.1"
+    static let library_version = "0.2.2"
     
     static var cpuArchitecture: String = {
 #if arch(x86_64)
@@ -18,8 +18,7 @@ enum Info {
     
     static var appInfo: AppInfo = {
         if let infoDict = Bundle.main.infoDictionary {
-            let bundleIdentifier = Bundle.main.bundleIdentifier ?? "Unknown"
-            let namespace = bundleIdentifier.components(separatedBy: ".").first ?? bundleIdentifier
+            let namespace = Bundle.main.bundleIdentifier ?? "Unknown"
             return AppInfo(namespace: namespace,
                            name: infoDict["CFBundleName"] as? String ?? "Unknown",
                            version: infoDict["CFBundleShortVersionString"] as? String ?? "Unknown",
