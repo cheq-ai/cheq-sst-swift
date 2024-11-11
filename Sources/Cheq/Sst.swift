@@ -11,7 +11,10 @@ public class Sst {
     static internal var uaTask:Task<Void, Never> {
         let task = Task {
             let userAgent = await MainActor.run {
-                let webView = WKWebView()
+                let config = WKWebViewConfiguration()
+                config.limitsNavigationsToAppBoundDomains = true
+                config.preferences.javaScriptEnabled = false
+                let webView = WKWebView(frame: CGRect(), configuration: config)
                 return webView.value(forKey: "userAgent") as? String
             }
             Sst.instance?.userAgent = userAgent
