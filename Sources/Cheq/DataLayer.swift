@@ -1,19 +1,15 @@
 import Foundation
 import os
 
-
 /// A data layer that stores key-value pairs to persistent storage.
-public struct DataLayer {
+public class DataLayer : Storage {
     internal let log = Logger(subsystem: "Cheq", category: "DataLayer")
-    internal let suiteName = "cheq.sst.datalayer"
-    let data:UserDefaults?
     
-    init() {
-        self.data = UserDefaults(suiteName: suiteName)
+    init () {
+        super.init(suiteName: "cheq.sst.datalayer")
     }
     
-    
-    /// returns all data present in data layer
+    /// returns all data present
     /// - Returns: dictionary of data, non-primitive data is returned as dictionaries
     public func all() -> [String: Any] {
         var result:[String: Any] = [:]
@@ -30,22 +26,7 @@ public struct DataLayer {
         return result
     }
     
-    
-    /// clears all values from the data layer
-    public func clear() {
-        data?.removePersistentDomain(forName: suiteName)
-    }
-    
-    
-    /// checks if key is present in data layer
-    /// - Parameter key: key to check
-    /// - Returns: true if key exists in data layer
-    public func contains(_ key:String) -> Bool {
-        return data?.persistentDomain(forName: suiteName)?.index(forKey: key) != nil
-    }
-    
-    
-    /// gets value from data layer if present
+    /// gets value if present
     /// - Parameter key: key to retrieve
     /// - Returns: value if present, non-primitive data is returned as dictionaries
     public func get(_ key: String) -> Any? {
@@ -61,7 +42,7 @@ public struct DataLayer {
     }
     
     
-    /// stores a value for the key in the data layer
+    /// stores a value for the key
     /// - Parameters:
     ///   - key: key to store
     ///   - value: value to store
@@ -75,17 +56,5 @@ public struct DataLayer {
                 await Sst.sendError(msg: "Key \(key), details: \(error.localizedDescription)", fn: "Sst.dataLayer.add", errorName: "SerializationError")
             }
         }
-    }
-    
-    
-    /// removes a key from data layer if present
-    /// - Parameter key: key to remove
-    /// - Returns: true if key exists in data layer and was removed
-    public func remove(_ key: String) -> Bool {
-        guard contains(key) else {
-            return false
-        }
-        data?.removeObject(forKey: key)
-        return true
     }
 }

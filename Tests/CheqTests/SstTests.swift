@@ -6,6 +6,10 @@ final class SstTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         Sst.clearCheqUuid()
+        Sst.dataLayer.clear()
+        Sst.sessionStorage.clear()
+        Sst.cookies.clear()
+        Sst.localStorage.clear()
     }
     
 #if os(visionOS)
@@ -44,6 +48,12 @@ final class SstTests: XCTestCase {
         let date = Date(timeIntervalSince1970: 1337)
         let config = Config("di_demo", domain: "echo.cheqai.workers.dev", debug: true, dateProvider: StaticDateProvider(fixedDate: date))
         Sst.configure(config)
+        Sst.cookies.add(key: "cookie1", value: "a")
+        Sst.localStorage.add(key: "localStorage1", value: "c")
+        Sst.localStorage.add(key: "localStorage2", value: "d")
+        Sst.sessionStorage.add(key: "sessionStorage1", value: "e")
+        Sst.sessionStorage.add(key: "sessionStorage2", value: "f")
+        Sst.sessionStorage.add(key: "sessionStorage3", value: "g")
         let eventName = "testTrackEvent"
         let customData = CustomData(custom_data: [:],
                                     event_name: "PageView",event_id: "0b11049b2-8afc-4156-9b69-342c692309210",
@@ -268,6 +278,36 @@ final class SstTests: XCTestCase {
         XCTAssertNotNil(virtualBrowser["timezone"])
         if let pageUrl = config.virtualBrowser.page {
             XCTAssertEqual(pageUrl, virtualBrowser["page"] as! String, "invalid virtualBrowserPage")
+        }
+        let storage = requestDict["storage"] as? [String: Any]
+        let cookies = Sst.cookies.all()
+        let localStorage = Sst.localStorage.all()
+        let sessionStorage = Sst.sessionStorage.all()
+        if !cookies.isEmpty || !localStorage.isEmpty || !sessionStorage.isEmpty {
+            XCTAssertNotNil(storage)
+        } else {
+            XCTAssertNil(storage)
+        }
+        if !cookies.isEmpty {
+            let requestCookies = storage?["cookies"] as? [[String: String]]
+            XCTAssertNotNil(requestCookies)
+            requestCookies?.forEach { cookie in
+                XCTAssertEqual(cookies[cookie["name"]!], cookie["value"])
+            }
+        }
+        if !localStorage.isEmpty {
+            let requestLocalStorage = storage?["localStorage"] as? [[String: String]]
+            XCTAssertNotNil(requestLocalStorage)
+            requestLocalStorage?.forEach { storageItem in
+                XCTAssertEqual(localStorage[storageItem["key"]!], storageItem["value"])
+            }
+        }
+        if !sessionStorage.isEmpty {
+            let requestSessionStorage = storage?["sessionStorage"] as? [[String: String]]
+            XCTAssertNotNil(requestSessionStorage)
+            requestSessionStorage?.forEach { storageItem in
+                XCTAssertEqual(sessionStorage[storageItem["key"]!], storageItem["value"])
+            }
         }
     }
     

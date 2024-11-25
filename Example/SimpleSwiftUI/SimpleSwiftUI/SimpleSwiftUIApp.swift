@@ -13,6 +13,7 @@ struct SimpleSwiftUIApp: App {
         }
         SimpleSwiftUIApp.initializeSst()
     }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

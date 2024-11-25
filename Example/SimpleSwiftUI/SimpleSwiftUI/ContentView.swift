@@ -70,8 +70,8 @@ struct HomeView: View {
             Button("Trigger DataLayer.add Error") {
                 Sst.dataLayer.add(key: "bad", value: BadEncodable())
             }.padding()
-            NavigationLink(destination: LoginView()) {
-                Text("Go to Login")
+            NavigationLink(destination: StorageView()) {
+                Text("Go to Storage")
             }.padding()
             NavigationLink(destination: ConfigView()) {
                 Text("Go to Config")
@@ -88,22 +88,40 @@ struct HomeView: View {
     }
 }
 
-struct LoginView: View {
+struct StorageView: View {
     var body: some View {
         VStack {
-            Text("Login Screen")
+            Text("Storage Screen")
                 .font(.title)
                 .padding()
+            Button("Clear All Storage") {
+                Sst.cookies.clear()
+                Sst.localStorage.clear()
+                Sst.sessionStorage.clear()
+            }.padding()
+            Button("Privacy Enable Analytics") {
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_BANNER_VIEWED", value: "1")
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_BANNER_LOADED", value: "1")
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_Analytics", value: "1")
+            }.padding()
+            Button("Privacy Disable Analytics") {
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_BANNER_VIEWED", value: "1")
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_BANNER_LOADED", value: "1")
+                Sst.cookies.add(key: "MOBILE_DEMO_ENSIGHTEN_PRIVACY_Analytics", value: "0")
+            }.padding()
+            Button("Set localStorage") {
+                Sst.localStorage.add(key: "hello", value: "world")
+            }.padding()
+            Button("Set sessionStorage") {
+                Sst.sessionStorage.add(key: "foo", value: "bar")
+            }.padding()
             NavigationLink(destination: HomeView()) {
                 Text("Go to Home")
-            }.padding()
-            NavigationLink(destination: ConfigView()) {
-                Text("Go to Config")
             }.padding()
         }
         .onAppear {
             Task {
-                await Sst.trackEvent(Event("screen_view", data: ["screen_name": "Login"]))
+                await Sst.trackEvent(Event("screen_view", data: ["screen_name": "Storage"]))
             }
         }
     }
