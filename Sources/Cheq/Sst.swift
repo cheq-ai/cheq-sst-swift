@@ -13,7 +13,7 @@ public class Sst {
             let userAgent = await MainActor.run {
                 let config = WKWebViewConfiguration()
                 config.limitsNavigationsToAppBoundDomains = true
-                config.preferences.javaScriptEnabled = false
+                config.defaultWebpagePreferences.allowsContentJavaScript = false
                 let webView = WKWebView(frame: CGRect(), configuration: config)
                 return webView.value(forKey: "userAgent") as? String
             }
@@ -26,6 +26,15 @@ public class Sst {
     
     /// Persistent data layer
     public static let dataLayer = DataLayer()
+    
+    /// Cookie storage
+    public static let cookies = Cookies()
+    
+    /// Local storage
+    public static let localStorage = LocalStorage()
+    
+    /// Session storage
+    public static let sessionStorage = SessionStorage()
     
     let config:Config
     var userAgent: String?
@@ -76,7 +85,7 @@ public class Sst {
         }
         
         let screenInfo = instance.config.screenEnabled ? Info.getScreenInfo() : nil
-        let sstData: [String: Any] = [
+        var sstData: [String: Any] = [
             "settings": Settings(publishPath: instance.config.publishPath, nexusHost: instance.config.nexusHost),
             "dataLayer": [
                 "__mobileData": await instance.config.models.collect(event: event, sst: instance),
@@ -89,6 +98,10 @@ public class Sst {
                                                  language: Locale.preferredLanguages.joined(separator: ","),
                                                  page: instance.config.virtualBrowser.page)
         ]
+        
+        if let storage = getStorageData() {
+            sstData["storage"] = storage
+        }
         
         let jsonString: String
         do {
@@ -155,6 +168,20 @@ public class Sst {
         } else {
             return value.prefix(maxLength - 3) + "..."
         }
+    }
+    
+    static func getStorageData() -> [String: Any]? {
+        var storage:[String: Any] = [:]
+        if let cookies = Sst.cookies.eventData() {
+            storage["cookies"] = cookies
+        }
+        if let localStorage = Sst.localStorage.eventData() {
+            storage["localStorage"] = localStorage
+        }
+        if let sessionStorage = Sst.sessionStorage.eventData() {
+            storage["sessionStorage"] = sessionStorage
+        }
+        return storage.isEmpty ? nil : storage
     }
     
     func getParams(params:[String: String]) -> [URLQueryItem] {
